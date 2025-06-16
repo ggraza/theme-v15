@@ -1,9 +1,9 @@
 <aside class="left-sidebar with-vertical">
     <div class="brand-logo d-flex gap-3 align-items-center justify-content-between">
         <a href="/app" class="text-nowrap logo-img">
-          <img src="/assets/theme/img/sindh-gov-logo.png" class="dark-logo" alt="Logo-Dark" /> 
+          <img src="{{ logo or '/files/ppep-logo.png' }}" class="dark-logo" alt="Logo-Dark" /> 
         </a> 
-            <a href='/app/configuration-screens' class="m-0 toggler text-decoration-none">Directorate General of <b>Monitoring and Evaluation</b></a>  
+            <a href='/app' class="m-0 toggler text-decoration-none hidden d-none">{{ _('{0}').format(app_name or _("Frappe")) }}</a>  
         <a href="javascript:void(0)" onclick="sidebartoggler()" class="sidebartoggler ms-auto text-decoration-none fs-5 d-block d-xl-none">
           <i class="ti ti-x"></i>
         </a>
@@ -33,15 +33,51 @@
                                  <ul class="sub-menu collapse " id="item{{jsoncontent[0]['id']}}" >
                                     {% for card in page.cards["items"] %}
                                     <li>
-                                        <a class="ms-link desk-sidebar-item standard-sidebar-item side-menu__link" href=javascript:;>
-                                          <div class=side-menu__link__title>{{ _(card.label) }}</div>
-                                          <i class="stroke-[1] h-5 w-5 cursor-pointer side-menu__link__chevron" data-tw-merge="" data-lucide=chevron-down></i>
+                                        <a class="ms-link desk-sidebar-item has-arrow success-hover-bg standard-sidebar-item side-menu__link" href="javascript:;"  data-bs-parent="#accordionmainmenu" data-bs-toggle="collapse" data-bs-target="#itemcard{{card['name']}}" href="#" aria-expanded="false">
+                                            
+                                        <span class="mx-2 ps-1">{{card.label}}</span>
+                                        <span class="arrow fa fa-angle-down ms-auto text-end d-none hide"></span>
+                                          <!-- <div class=side-menu__link__title>{{ _(card.label) }}</div>
+                                          <i class="stroke-[1] h-5 w-5 cursor-pointer side-menu__link__chevron" data-tw-merge="" data-lucide=chevron-down></i> -->
                                         </a>
-                                        <ul  style="display:none">{% for link in card.links %} <li>
-                                            <a class="side-menu__link link_to_page" href=javascript:; data-title="{{ link.link_to }}" data-is_link=1>
-                                              <div class="side-menu__link__title">{{ _(link.label) }}</div>
-                                            </a>
-                                          </li>{% endfor %} 
+                                        <ul  class="sub-menu collapse " id="itemcard{{card['name']}}">
+                                          {% for link in card.links %} 
+                                            <li>
+                                              {% if link.link_type == 'Report' %}
+                                              <a class="ms-link desk-sidebar-item standard-sidebar-item side-menu__link" href="/app/query-report/{{card.link_to}}">
+                                                <div class=side-menu__link__title>{{ _(card.label) }}</div>
+                                                <i class="stroke-[1] h-5 w-5 cursor-pointer side-menu__link__chevron" data-tw-merge="" data-lucide=chevron-down></i>
+                                              </a> 
+                                              {% elif link.link_type == 'Page' %}
+                                              <a class="ms-link desk-sidebar-item standard-sidebar-item side-menu__link" href="/app/{{card.link_to}}">
+                                                <div class=side-menu__link__title>{{ _(card.label) }}</div>
+                                                <i class="stroke-[1] h-5 w-5 cursor-pointer side-menu__link__chevron" data-tw-merge="" data-lucide=chevron-down></i>
+                                              </a> 
+                                              {% else %} 
+                                              {% set doctype_slug = link.link_to.lower().replace(' ','-') %}
+                                              {% if link.doc_view == 'List' %}
+                                                  {% set url = doctype_slug + '/view/list' %}
+                                              {% elif link.doc_view == 'Tree' %}
+                                                  {% set url = doctype_slug + '/view/tree' %}
+                                              {% elif link.doc_view == 'Report Builder' %}
+                                                  {% set url = doctype_slug + '/view/report' %}
+                                              {% elif link.doc_view == 'Dashboard' %}
+                                                  {% set url = doctype_slug + '/view/dashboard' %}
+                                              {% elif link.doc_view == 'New' %}
+                                                  {% set url = doctype_slug + '/new' %}
+                                              {% elif link.doc_view == 'Calendar' %}
+                                                  {% set url = doctype_slug + '/view/calendar/default' %}
+                                              {% elif link.doc_view == 'Kanban' %}
+                                                  {% set url = doctype_slug + '/view/kanban' %}
+                                              {% else %} 
+                                                  {% set url = doctype_slug %}
+                                              {% endif %}
+                                              <a class="side-menu__link link_to_page" href={{ url }} data-title="{{ link.link_to }}" data-is_link=1>
+                                                <div class="side-menu__link__title">{{ _(link.label) }}</div>
+                                              </a>
+                                              {% endif %}
+                                            </li>
+                                          {% endfor %} 
                                         
                                         </ul>
                                       </li> 
@@ -50,6 +86,11 @@
                                     <li>
                                         {% if card.type == 'URL' %}
                                         <a class="ms-link desk-sidebar-item standard-sidebar-item side-menu__link" href="/app{{card.url}}">
+                                          <div class=side-menu__link__title>{{ _(card.label) }}</div>
+                                          <i class="stroke-[1] h-5 w-5 cursor-pointer side-menu__link__chevron" data-tw-merge="" data-lucide=chevron-down></i>
+                                        </a> 
+                                         {% elif card.type == 'Report' %}
+                                        <a class="ms-link desk-sidebar-item standard-sidebar-item side-menu__link" href="/app/query-report/{{card.link_to}}">
                                           <div class=side-menu__link__title>{{ _(card.label) }}</div>
                                           <i class="stroke-[1] h-5 w-5 cursor-pointer side-menu__link__chevron" data-tw-merge="" data-lucide=chevron-down></i>
                                         </a> 
